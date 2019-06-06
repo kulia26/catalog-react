@@ -1,3 +1,3 @@
 /catalog/node_modules
 /express/node_modules
-/express/public
+/express/public/images/*
