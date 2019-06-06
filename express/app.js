@@ -172,7 +172,7 @@ app.get('/getItems/:number', (req, res) => {
 });
 
 app.post('/addItem',  upload.single('image'), (req, res) => {
-  if (req.user.isAdmin && req.user) {
+  if ( req.user && req.user.isAdmin) {
     const fileName = saveImage(req);
     const details = {
       name: req.body.name,
@@ -202,7 +202,7 @@ app.post('/deleteItem/:number', (req, res) => {
 });
 
 app.post('/updateItem/:id',  upload.single('image'), (req, res) => {
-  if (req.user.isAdmin && req.user) {
+  if ( req.user && req.user.isAdmin ) {
     const fileName = saveImage(req);
     const details = {
       name: req.body.name,

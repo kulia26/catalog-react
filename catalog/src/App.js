@@ -50,7 +50,7 @@ class App extends React.Component{
   login(){
     let user = JSON.parse(sessionStorage.getItem('user'));
     this.setState({
-      login: sessionStorage.getItem('user') ? true : false,
+      login: user.name ? true : false,
       image: user.image,
       isAdmin: user ? user.isAdmin : false,
       });
