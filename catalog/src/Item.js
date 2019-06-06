@@ -17,41 +17,20 @@ class Item extends React.Component {
           description:'',
           },
           user: user};
-        this.getAdminButtons = this.getAdminButtons.bind(this);
         this.getAddRespond = this.getAddRespond.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
         
     }
 
-    componentDidMount () {
-      
-      axios.get('http://localhost:8081/getItem/' + this.state.item.id )
+    componentDidMount() {
+      axios.get('http://localhost:8081/getItem/' + this.props.match.params.id )
       .then(res => {
-        this.setState({item: JSON.parse(res.body)});
+        this.setState({item: res.data});
       })
-      .catch(err=>{
-        
+      .catch((err, res)=>{
+        this.setState({err:err.message})
       });
      }
 
-    getAdminButtons() {
-        if(this.props.isAdmin){
-          return(
-            <>
-            <div className="buttons">
-              <div className="button">
-              <button onClick={this.deleteThisItem}><span >🗑️</span>Видалити</button>
-              </div>
-              <div className="button">
-              <Link to="/edititem">
-               <button onClick={this.editThisItem}><span>✍️</span>Редагувати</button>
-               </Link>
-             </div>
-            </div>
-            </>
-          )
-        }
-    }
 
     getAddRespond() {
         if(this.props.login){
@@ -60,25 +39,28 @@ class Item extends React.Component {
                 <div className="buttons">
                   <div className="button">
                   <Link to={"/addRespond/"+this.props.match.params.id}>
-                   <button ><span>✍️</span>Додати відгук</button>
+                   <button >Додати відгук</button>
                    </Link>
                  </div>
                 </div>
                 </>
               )
         }
-          
-        
     }
 
     getResponds() {
-      const responds = this.state.responds;
+      if(this.state.item.responds){
+        const responds = this.state.item.responds;
        if(responds && responds.length){
         return responds.map(res =>{
-            return (<Respond text={res.text} user={res.addedBy}></Respond>)
+            return (<Respond text={res.text} image={res.image} name={res.name} ></Respond>)
         })
        }
+      }
+      
     }
+
+  
 
     render()
     {
@@ -88,14 +70,15 @@ class Item extends React.Component {
                 <div className="col1 flex item">
 
                     <div className="image col2">
-                        <img src={this.state.item.image} alt={this.state.item.name}></img>
+                        <img src={this.state.item.image || ''} alt={this.state.item.name || ''}></img>
                     </div>
                     <div className="text col5">
-                        <h3>{this.state.item.name}</h3>
+                        <h3>{this.state.item.name || ''}</h3>
 
-                        <i>{this.state.item.description}</i>
+                        <i>{this.state.item.description || ''}</i>
                         
                     </div>
+                    {this.getAddRespond()}
 
                 </div>
             </section>
@@ -104,9 +87,9 @@ class Item extends React.Component {
                     Відгуки покупців
                 </h1>
             </div>
-            <section className="flex">
+            <section className="flex column">
                
-      
+            {this.getResponds()}
             </section>
            </>
 

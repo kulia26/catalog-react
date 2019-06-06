@@ -4,36 +4,7 @@ const axios = require('axios');
 
 
 class Respond extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-
-    deleteThisItem() {
-      const item = this.props.item;
-      
-      const url = 'http://localhost:8081/deleteItem/'+item._id;
-      const user = JSON.parse(sessionStorage.getItem('user'));
-      if(user){
-        const config = {
-            headers: {
-                "Authorization" : 'Bearer ' + user.token,
-            },  
-        }
-        axios
-        .post(url, item, config)
-        .then((res) => {
-          this.setState({ message : res.data.message});
-          this.props.onDelete(item);
-        })
-        .catch(err => this.setState({ message :  err.message}));
-      }else{
-        window.alert('Ви не авторизовані !');
-      }
-     }
-        
-    
-
+  
     render()
     {
         return(

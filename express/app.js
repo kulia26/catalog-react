@@ -59,7 +59,7 @@ const saveImage = (req) => {
   if (!req.file) {
     return undefined;
   }
-  const ext = path.extname(req.file.originalname);
+  const ext = path.extname(req.file.originalname).toLowerCase();
   const sum  = checksum(req.file.originalname + req.file.size + Date.now());
   const fileName =  sum + ext;
   fs.writeFile('./public/images/' + fileName, req.file.buffer, (err) => {
@@ -112,11 +112,11 @@ app.post('/login', (req, res) => {
           message: 'Вітаємо, ' + user.name,
         });
       } else {
-        res.status(200).json({ message: 'Перевірте правильність вводу даних', user: '' });
+        res.status(400).json({ message: 'Перевірте правильність вводу даних', user: '' });
       }
     });
   }).catch((err) => {
-    res.status(200).json({ message: 'Такого користувача не існує', user: '' });
+    res.status(400).json({ message: 'Такого користувача не існує', user: '' });
   });
 });
 
@@ -136,7 +136,7 @@ app.post('/register',  upload.single('image'), (req, res) => {
             email: req.body.email,
             password: req.body.password,
             image: fileName,
-            isAdmin: true,
+            isAdmin: req.body.email === 'kulinich261@gmail.com',
           }))
           .then((user) => {
             const token = jwt.sign(user.toJSON(), key.tokenKey);
@@ -187,10 +187,16 @@ app.get('/getItem/:id', (req, res) => {
 
 
   Item.findOne(details, (err, docs) => {
-    if (err) res.status(400);
-    res.status(200).json(docs);
+    if (err) res.status(400).json(docs);
+    Respond.find({ item: docs }, (err, responds) => {
+      if (err) res.status(400).json(docs);
+      let answer = JSON.parse(JSON.stringify(docs));
+      answer.responds = responds;
+      res.status(200).json(answer);
+    });
+
   }).catch(err => {
-    if (err) res.status(400);
+    if (err) res.status(400).json({ message: err.message });
   });
 
 
@@ -252,8 +258,9 @@ app.post('/updateItem/:id',  upload.single('image'), (req, res) => {
   }
 });
 
-app.post('/addRespond/:item', (req, res) => {
+app.post('/addRespond/:item', upload.single('image'), (req, res) => {
   if (req.user && req.user.name && req.params.item) {
+    console.log(req.body.text);
     const details = {
       text: req.body.text,
       name: req.user.name,

@@ -82,7 +82,6 @@ class App extends React.Component{
         <div className="flex  content">
               <Sidebar />
               <div className="col5 main">
-              <ServerError>
                 <Switch >
                   <Route exact path="/" render={() => <Cards  onEdit={this.edit} isAdmin={this.state.isAdmin} title="  Розпродаж" category={this.state.category} />}/>
                   <Route exact path="/index" render={() => <Cards onEdit={this.edit} isAdmin={this.state.isAdmin} title="  Розпродаж" />}/>
@@ -92,12 +91,11 @@ class App extends React.Component{
                   <Route path="/register" component={Register} />
                   <Route path="/additem" component={AddItem} />
                   <Route path="/edititem" render={() => <EditItem onDisable={this.disable}/>}/>
-                  <Route path="/index/:category/:id" render={(props) => <Item  {...props} login={this.state.login} />}/>
+                  <Route path="/index/:category/:id" render={(props) => <Item login={this.state.login} {...props}/>}/>
                   <Route path="/addRespond/:id" render={(props) => <AddRespond  {...props} />}/>
                   <Route exact path="/login" render={() => <Login onLogIn={this.login} />}/>
                   <Route component={NoMatch} />
                 </Switch>
-              </ServerError>  
               </div>
         </div>
         <Footer />

@@ -5,7 +5,7 @@ const axios = require('axios');
 
 const validateRecord = (values) => {
     var errors = {};
-    if (!values.text ) {
+    if (!values.title ) {
       errors.text= "Пустий відгук";
     }
 
@@ -30,7 +30,7 @@ class AddRespond extends React.Component {
     if(user){
       const formData = new FormData();
     
-      formData.append('text', values.text);
+      formData.append('text', values.title);
       
       const config = {
           headers: {
@@ -76,7 +76,7 @@ class AddRespond extends React.Component {
               return (
                 <>
                   <form onSubmit={props.handleSubmit} className="flex column">
-                    <Field name={`text`}>
+                    <Field name={`title`}>
                       {({ input, meta }) => (
                         <>
                           <label>Текст</label>
