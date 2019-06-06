@@ -77,12 +77,16 @@ app.use((req, res, next) => {
             req.user = doc;
             next();
           }
-        );
+        ).catch((err)=>{
+          req.user = {};
+        });
       } else {
+        req.user = {};
         next();
       }
     });
   } catch (e) {
+    req.user = {};
     next();
   }
 });
@@ -168,7 +172,7 @@ app.get('/getItems/:number', (req, res) => {
 });
 
 app.post('/addItem',  upload.single('image'), (req, res) => {
-  if (req.user.isAdmin) {
+  if (req.user.isAdmin && req.user) {
     const fileName = saveImage(req);
     const details = {
       name: req.body.name,

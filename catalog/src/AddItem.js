@@ -23,7 +23,7 @@ class AddItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: User,
+      user: sessionStorage.getItem('user'),
       message: 'Додайте новий товар', 
       image: '',
      };
