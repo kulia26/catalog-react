@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Field } from 'react-final-form'
 const axios = require('axios');
 
-const User = sessionStorage.getItem('user');
+
 const validateRecord = (values) => {
     var errors = {};
     if (!values.title ) {

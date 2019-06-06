@@ -77,7 +77,7 @@ app.use((req, res, next) => {
             req.user = doc;
             next();
           }
-        ).catch((err)=>{
+        ).catch((err) => {
           req.user = {};
         });
       } else {
@@ -198,6 +198,30 @@ app.post('/deleteItem/:number', (req, res) => {
     });
   } else {
     res.status(401).json({ message: 'Помилка доступу' });
+  }
+});
+
+app.post('/updateItem/:id',  upload.single('image'), (req, res) => {
+  if (req.user.isAdmin && req.user) {
+    const fileName = saveImage(req);
+    const details = {
+      name: req.body.name,
+      description: req.body.description,
+      image: fileName,
+      category: req.body.category,
+      addedBy: req.user._id,
+    };
+    const id = req.params.id;
+    Item.findOne({ _id: id }, (err, item) => {
+      item.name = details.name;
+      item.description = details.description;
+      item.image = details.image;
+      item.category = details.category;
+      item.save();
+    });
+    res.status(200).json({ message: 'Ви успішно відредагували товар' });
+  } else {
+    res.status(401).json({ message: 'Помилка доступу', user: '' });
   }
 });
 

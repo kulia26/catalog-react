@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form'
 import categories from './categories';
+import { Link } from "react-router-dom";
 const axios = require('axios');
 
-const User = sessionStorage.getItem('user');
 const validateRecord = (values) => {
     var errors = {};
     if (!values.title ) {
@@ -19,17 +19,20 @@ const validateRecord = (values) => {
     return errors;
 }
 
+
+
 class EditItem extends React.Component {
 
   constructor(props) {
     super(props);
+    const item = sessionStorage.getItem('editing');
     this.state = {
-      user: User,
-      item: this.props.item,
+      item: item ? JSON.parse(item): undefined,
      };
     this.onSubmit = this.onSubmit.bind(this);
     this.fileChangedHandler = this.fileChangedHandler.bind(this);
   }
+
   
   getCategories(){
 
@@ -49,8 +52,7 @@ class EditItem extends React.Component {
   }
 
   onSubmit(values) {
-
-    const url = 'http://localhost:8081/addItem';
+    const url = 'http://localhost:8081/updateItem/'+this.state.item._id;
     const user = JSON.parse(sessionStorage.getItem('user'));
     if(user){
       const formData = new FormData();
@@ -88,32 +90,32 @@ class EditItem extends React.Component {
             <Form
             onSubmit={this.onSubmit}
             validate={validateRecord}
-            validateOnBlur={false}
+            validateOnBlur={true}
             onChange={validateRecord}
             render={(props) => {
               return (
                 <>
                   <form onSubmit={props.handleSubmit} className="flex column">
-                    <Field name={`title`}>
+                    <Field name={`title`} defaultValue={this.state.item.name}>
                       {({ input, meta }) => (
                         <>
                           <label>Назва</label>
-                          <input {...input} value={this.state.item.name} type="text" placeholder="назва товару" />
+                          <input {...input}  type="text" placeholder="назва товару" />
                           <p className="error">{meta.error}</p>
                         </>
                       )}
                     </Field>
-                    <Field name={`description`}>
+                    <Field name={`description`}  defaultValue={this.state.item.description}>
                       {({ input, meta }) => (
                         <>
                           <label>Опис</label>
-                          <input {...input} value={this.state.item.description} type="text" placeholder="опис товару" />
+                          <input {...input} type="text" placeholder="опис товару" />
                           <p className="error">{meta.error}</p>
                         </>
                       )}
                     </Field>
                     <label>Категорія</label>
-                    <Field name="category" component="select">
+                    <Field name="category" component="select"  defaultValue={this.state.item.category}>
                           {this.getCategories()}
                     </Field>
                     <Field name={`image`}>
@@ -129,8 +131,10 @@ class EditItem extends React.Component {
                       <button type="submit" disabled={props.submitting || props.pristine}>
                         Зберегти
                       </button>
-                      <button type="button" disabled={props.submitting || props.pristine}>
+                      <button type="button" onClick={this.props.onDisable}>
+                        <Link to="/">
                         Відмінити
+                        </Link>
                       </button>
                     </div>
                   </form>

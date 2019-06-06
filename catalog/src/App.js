@@ -19,17 +19,16 @@ class App extends React.Component{
   constructor(props) {
     super(props);
     let user = sessionStorage.getItem('user');
-    let editing = sessionStorage.getItem('editing');
-    user = user ? user : {};
-    editing = editing ? editing : {};
+    user = user ? JSON.parse(user) : {};
     this.state = {
-      login: user ? true : false,
+      login: user.name ? user.login: false,
        image: user ? user.image : '', 
        isAdmin: user ? user.isAdmin : false,
-       editing: editing ? editing : {},
+       editing: false,
     };
     this.logout  = this.logout.bind(this);
     this.login = this.login.bind(this);
+    this.disable = this.disable.bind(this);
     this.edit = this.edit.bind(this);
   }
 
@@ -38,6 +37,13 @@ class App extends React.Component{
     this.setState({
       login: false,
       isAdmin:  false,
+    });
+  }
+
+  disable(){
+    sessionStorage.removeItem('editing');
+    this.setState({
+      editing: false,
     });
   }
 
@@ -52,7 +58,7 @@ class App extends React.Component{
 
   edit(){
     this.setState({
-      editing: JSON.parse(sessionStorage.getItem('editing')),
+      editing: true,
       });
   }
 
@@ -60,7 +66,7 @@ class App extends React.Component{
   renderRouterCategories(){
     let render = [];
     for (const key in categories) {
-      render.push( <Route exact path={/index/+key} render={() => <Cards onEdit={this.edit} isAdmin={this.state.isAdmin} title={categories[key]} category={key} />}/>);
+      render.push( <Route key ={key} exact path={/index/+key} render={() => <Cards onEdit={this.edit} isAdmin={this.state.isAdmin} title={categories[key]} category={key} />}/>);
     }
     return render;
   }
@@ -75,7 +81,7 @@ class App extends React.Component{
               <Sidebar />
               <div className="col5 main">
               <ServerError>
-                <Switch>
+                <Switch >
                   <Route exact path="/" render={() => <Cards  onEdit={this.edit} isAdmin={this.state.isAdmin} title="  Розпродаж" category={this.state.category} />}/>
                   <Route exact path="/index" render={() => <Cards onEdit={this.edit} isAdmin={this.state.isAdmin} title="  Розпродаж" />}/>
                   {this.renderRouterCategories()}
@@ -83,7 +89,7 @@ class App extends React.Component{
                   <Route path="/contacts" component={Contacts} />
                   <Route path="/register" component={Register} />
                   <Route path="/additem" component={AddItem} />
-                  <Route path="/edititem" render={() => <EditItem item={this.state.editing}/>}/>
+                  <Route path="/edititem" render={() => <EditItem onDisable={this.disable}/>}/>
                   <Route exact path="/login" render={() => <Login onLogIn={this.login} />}/>
                   <Route component={NoMatch} />
                 </Switch>

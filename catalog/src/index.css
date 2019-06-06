@@ -216,6 +216,19 @@ a {
 
 }
 
+article button{
+  background: none;
+  border: none;
+  float: left;
+  cursor: pointer;
+
+
+}
+article a{
+  text-align: center;
+  cursor: pointer;
+}
+
 nav {
   height: 77px;
   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.08);

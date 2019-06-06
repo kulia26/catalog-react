@@ -9,9 +9,9 @@ class Card extends React.Component {
         this.deleteThisItem = this.deleteThisItem.bind(this);
         this.editThisItem = this.editThisItem.bind(this);
     }
-
     deleteThisItem() {
       const item = this.props.item;
+      
       const url = 'http://localhost:8081/deleteItem/'+item._id;
       const user = JSON.parse(sessionStorage.getItem('user'));
       if(user){
@@ -20,13 +20,16 @@ class Card extends React.Component {
                 "Authorization" : 'Bearer ' + user.token,
             },  
         }
-        axios.post(url,{item},config)
-        .then(res => this.setState({ message : res.data.message}))
+        axios
+        .post(url, item, config)
+        .then((res) => {
+          this.setState({ message : res.data.message});
+          this.props.onDelete(item);
+        })
         .catch(err => this.setState({ message :  err.message}));
       }else{
         window.alert('Ви не авторизовані !');
       }
-      this.props.onDelete(item);
      }
 
      editThisItem() {
@@ -38,10 +41,18 @@ class Card extends React.Component {
         if(this.props.isAdmin){
           return(
             <>
-              <button onClick={this.deleteThisItem}>Видалити</button>
-               <Link to="/edititem">
-               <button onClick={this.editThisItem}>Редагувати</button>
-              </Link>
+            <div className="buttons">
+              <div className="button">
+              <button onClick={this.deleteThisItem}><span >🗑️</span>Видалити</button>
+              </div>
+              <div className="button">
+              <Link to="/edititem">
+               <button onClick={this.editThisItem}><span>✍️</span>Редагувати</button>
+               </Link>
+             </div>
+            </div>
+              
+               
               
             </>
           )
