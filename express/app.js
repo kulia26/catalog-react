@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const User = require('./user');
 const Item = require('./item');
 const key = require('./key');
+const Respond = require('./respond');
 
 const cors = require('cors');
 
@@ -55,6 +56,9 @@ mongoose.connect('mongodb://localhost/catalog', { useNewUrlParser: true });
 //mongoose.connect('mongodb://localhost/catalog', { useNewUrlParser: true }, () =>  mongoose.connection.db.dropDatabase());
 
 const saveImage = (req) => {
+  if (!req.file) {
+    return undefined;
+  }
   const ext = path.extname(req.file.originalname);
   const sum  = checksum(req.file.originalname + req.file.size + Date.now());
   const fileName =  sum + ext;
@@ -68,9 +72,9 @@ const saveImage = (req) => {
 app.use((req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
-    console.log(token);
+    //console.log(token);
     jwt.verify(token, key.tokenKey, (err, payload) => {
-      console.log(payload);
+      //console.log(payload);
       if (payload) {
         User.findOne({ email: payload.email }).then(
           (doc) => {
@@ -127,7 +131,13 @@ app.post('/register',  upload.single('image'), (req, res) => {
         const fileName = saveImage(req);
         console.log(fileName);
         User
-          .create(new User({ name: req.body.name, email: req.body.email, password: req.body.password, image: fileName, isAdmin: false }))
+          .create(new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            image: fileName,
+            isAdmin: true,
+          }))
           .then((user) => {
             const token = jwt.sign(user.toJSON(), key.tokenKey);
             res.status(200).json({
@@ -142,7 +152,7 @@ app.post('/register',  upload.single('image'), (req, res) => {
             });
           })
           .catch((err) => {
-            res.status(200).json({ message: 'Не вдалося створити користувача' + err.message });
+            res.status(400).json({ message: 'Не вдалося створити користувача' + err.message });
           });
       }
     }).catch((err) => {
@@ -167,12 +177,29 @@ app.get('/getItems/:number', (req, res) => {
   }
   Item.find(details, (err, docs) => {
     if (err) res.status(400).json({ message: err.message });
-    res.status(200).json(JSON.stringify(docs));
+    res.status(200).json(docs);
   });
 });
 
+app.get('/getItem/:id', (req, res) => {
+  const id = req.params.id;
+  const details = { _id: id };
+
+
+  Item.findOne(details, (err, docs) => {
+    if (err) res.status(400);
+    res.status(200).json(docs);
+  }).catch(err => {
+    if (err) res.status(400);
+  });
+
+
+
+
+});
+
 app.post('/addItem',  upload.single('image'), (req, res) => {
-  if ( req.user && req.user.isAdmin) {
+  if (req.user && req.user.isAdmin) {
     const fileName = saveImage(req);
     const details = {
       name: req.body.name,
@@ -202,8 +229,8 @@ app.post('/deleteItem/:number', (req, res) => {
 });
 
 app.post('/updateItem/:id',  upload.single('image'), (req, res) => {
-  if ( req.user && req.user.isAdmin ) {
-    const fileName = saveImage(req);
+  if (req.user && req.user.isAdmin) {
+    const fileName = saveImage(req) || undefined;
     const details = {
       name: req.body.name,
       description: req.body.description,
@@ -215,7 +242,7 @@ app.post('/updateItem/:id',  upload.single('image'), (req, res) => {
     Item.findOne({ _id: id }, (err, item) => {
       item.name = details.name;
       item.description = details.description;
-      item.image = details.image;
+      item.image = details.image ? details.image : item.image;
       item.category = details.category;
       item.save();
     });
@@ -224,6 +251,39 @@ app.post('/updateItem/:id',  upload.single('image'), (req, res) => {
     res.status(401).json({ message: 'Помилка доступу', user: '' });
   }
 });
+
+app.post('/addRespond/:item', (req, res) => {
+  if (req.user && req.user.name && req.params.item) {
+    const details = {
+      text: req.body.text,
+      name: req.user.name,
+      image: req.user.image,
+      user: req.user._id,
+      item: req.params.item,
+    };
+    console.log(JSON.stringify(details));
+    Respond.create(new Respond(details))
+      .then((resp) => {
+        res.status(200).json({ message: 'Відгук додано' });
+      }).catch((err) => {
+        res.status(200).json({ message: 'Відгук не додано' + err.message });
+      });
+  } else {
+    res.status(200).json({ message: 'Товар не знайдено' });
+  }
+});
+
+app.get('/getResponds/:item', (req, res) => {
+  const details = {
+    item: req.params.item,
+  };
+  Respond.find(details, (err, resps) => {
+    if (err) res.status(200).json({ message: 'Помилка доступу до відгуків' });
+    res.status(200).json(resps);
+  });
+
+}
+);
 
 app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
 module.exports = app;

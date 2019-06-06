@@ -16,7 +16,7 @@ class Cards extends React.Component {
 componentDidMount() {
   axios.get('http://localhost:8081/getItems/' + this.props.category )
   .then(res => {
-    this.setState({items: JSON.parse(res.data)});
+    this.setState({items: res.data});
   })
   .catch(err=>{
     window.alert(err);

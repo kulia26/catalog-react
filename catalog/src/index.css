@@ -193,7 +193,8 @@ a {
 
 #form1>input {
   display: block;
-  width: 77%;
+  max-width: 77%;
+  min-width: 77%;
   float: left;
   border-radius: 5px;
   border: 1px solid rgb(193, 193, 193);
@@ -423,10 +424,12 @@ section {
 }
 
 .advice img {
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
+  max-height: 10em;
+    max-width: 10em;
+    width: 10em;
+    height: 10em;
+    min-width: 10em;
+    min-height: 10em;
   position: absolute;
   top: 0;
   bottom: 0;

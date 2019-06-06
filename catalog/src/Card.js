@@ -62,12 +62,12 @@ class Card extends React.Component {
     {
         return (
             <article className="col1 flex column">
-                <a href="/item.html">
+                <Link to={"/index/"+this.props.item.category+"/"+this.props.item._id}>
                     <div className="image">
                         <img src={this.props.image} alt={this.props.title}></img>
                     </div>
                     <h3>{this.props.title}</h3>
-                </a>
+                </Link>
                 <i>{this.props.description}</i>
                 <br></br>
                 

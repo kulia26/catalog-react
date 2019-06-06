@@ -12,7 +12,9 @@ import Register from './Register';
 import ServerError from './ServerError';
 import Login from './Login';
 import AddItem from './AddItem';
+import AddRespond from './AddRespond';
 import EditItem from './EditItem';
+import Item from './Item';
 import categories from './categories';
 
 class App extends React.Component{
@@ -21,7 +23,7 @@ class App extends React.Component{
     let user = sessionStorage.getItem('user');
     user = user ? JSON.parse(user) : {};
     this.state = {
-      login: user.name ? user.login: false,
+      login: user.name ? true: false,
        image: user ? user.image : '', 
        isAdmin: user ? user.isAdmin : false,
        editing: false,
@@ -90,6 +92,8 @@ class App extends React.Component{
                   <Route path="/register" component={Register} />
                   <Route path="/additem" component={AddItem} />
                   <Route path="/edititem" render={() => <EditItem onDisable={this.disable}/>}/>
+                  <Route path="/index/:category/:id" render={(props) => <Item  {...props} login={this.state.login} />}/>
+                  <Route path="/addRespond/:id" render={(props) => <AddRespond  {...props} />}/>
                   <Route exact path="/login" render={() => <Login onLogIn={this.login} />}/>
                   <Route component={NoMatch} />
                 </Switch>
